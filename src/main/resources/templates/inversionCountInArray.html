@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Inversion Count In Array</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&display=swap');
+
+        body {
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, Dancing Script, cursive;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #34495e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #3498db;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, button {
+            margin-top: 5px;
+            padding: 8px;
+            width: calc(100% - 16px);
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+
+          #responseDiv, #descriptionDiv, #divLeft, #divRight {
+            margin-top: 20px;
+        }
+
+        #responseDiv {
+            border-top: 1px solid #3498db;
+        }
+
+   #divLeft, #divRight {
+            position: absolute;
+            top: 20px;
+            width: calc((100% - 700px) / 2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+                background-color: #272822;
+    color: #f8f8f2;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto;
+
+        }
+        #divRight code {
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#divRight .line-number {
+    display: inline-block;
+    margin-right: 10px;
+    color: #75715e;
+}
+         #divLeft {
+            left: 20px;
+        }
+
+        #divRight {
+            right: 20px;
+        }
+
+        #descriptionDiv {
+            margin-top: 20px;
+            background-color: #2c3e50;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #descriptionDiv h3 {
+            color: #3498db;
+        }
+
+        #descriptionDiv ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #descriptionDiv li {
+            margin-top: 8px;
+        }
+
+        #divRight {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background-color: #272822;
+    color: #f8f8f2;
+    font-family: 'Dancing Script', cursive;
+    overflow-x: auto;
+        }
+
+        #divRight h3 {
+            color: #3498db;
+        }
+
+        #divRight ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #divRight li {
+            margin-top: 8px;
+        }
+
+        #divLeft {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background-color: #272822;
+    color: #f8f8f2;
+    font-family: 'Dancing Script', cursive;
+    overflow-x: auto;
+        }
+
+        #divLeft h3 {
+            color: #3498db;
+        }
+
+        #divLeft ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #divLeft li {
+            margin-top: 8px;
+        }
+
+        #errorDiv {
+            color: red;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            display: block;
+            margin-top: 20px;
+        }
+
+
+    </style>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <h2>Inversion Count In Array</h2>
+
+  <!-- Initial form for displaying the input array -->
+  <form id="sortArrayForm">
+    <label for="inputArray">Input Array (comma-separated):</label>
+    <input type="text" id="inputArray" name="requestArray" required>
+    <button type="button" onclick="sortArray()">Sort</button>
+    <button type="button" onclick="sortArraysInLesserTime()">Sort In Less Time</button>
+  </form>
+
+  <!-- Section for showing the response -->
+  <div id="responseDiv"></div>
+
+  <!-- Section for showing the description -->
+  <div id="divLeft"></div>
+  <div id="descriptionDiv"></div>
+  <div id="divRight"></div>
+  <div id="errorDiv" th:if="${error}"></div>
+
+  <!-- Optional: Add a link to the "show" endpoint for initial display -->
+  <a th:href="@{/arrays/show}">Show Initial Form</a>
+</div>
+
+<script>
+        function sortArray() {
+            var inputArray = $('#inputArray').val();
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            var requestData = { "requestArray": inputArray };
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/arraysInv/inversionCountInArray",
+                data: JSON.stringify(requestData),
+                dataType: 'json',
+                beforeSend: function (xhr) {
+                    if (csrfHeader && csrfToken) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                    }
+                },
+                success: function(response) {
+                    // Update the response div with the result
+                    $('#responseDiv').html('<h3>Result:</h3><p>Response Array: ' + response.responseArray + '</p>');
+
+                    // Update the description div with the description list
+                    var descriptionHtml = '<h3>Description (Dry Run):</h3><ul>';
+                    $.each(response.description, function(index, item) {
+                        descriptionHtml += '<li>' + item + '</li>';
+                    });
+                    descriptionHtml += '</ul>';
+
+                      // Update the description div with the description list
+                    var descriptionHtml1 = '<h3>Java Code Snippet:</h3><ul>';
+                    $.each(response.responseCode, function(index, item) {
+                        descriptionHtml1 += '<li>' + item + '</li>';
+                    });
+                    descriptionHtml1 += '</ul>';
+
+                    // Update the description div with the description list
+                    var descriptionHtml2 = '<h3>Logic Explanation:</h3><ul>';
+                    $.each(response.theoryPortion, function(index, item) {
+                        descriptionHtml2 += '<li>' + item + '</li>';
+                    });
+                    descriptionHtml2 += '</ul>';
+                    $('#descriptionDiv').html(descriptionHtml);
+                       // Update divLeft with responseCode
+                    $('#divLeft').html(descriptionHtml1);
+
+                    // Update divRight with theoryPortion
+                    $('#divRight').html(descriptionHtml2);
+
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    $('#responseDiv').html('<p style="color: red;">An error occurred while sorting the array.</p>');
+                }
+            });
+        }
+        function sortArraysInLesserTime() {
+            var inputArray = $('#inputArray').val();
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            var requestData = { "requestArray": inputArray };
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/arraysInv/inversionCountInArrayOptimized",
+                data: JSON.stringify(requestData),
+                dataType: 'json',
+                beforeSend: function (xhr) {
+                    if (csrfHeader && csrfToken) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                    }
+                },
+                success: function(response) {
+                    // Update the response div with the result
+                    $('#responseDiv').html('<h3>Result:</h3><p>Response Array: ' + response.responseArray + '</p>');
+
+                    // Update the description div with the description list
+                    var descriptionHtml = '<h3>Description (Dry Run):</h3><ul>';
+                     var descriptionHtml2 = '<h3>Logic Explanation:</h3><ul>';
+                     var descriptionHtml1 = '<h3>Java Code Snippet:</h3><ul>';
+                    $.each(response.description, function(index, item) {
+                        descriptionHtml += '<li>' + item + '</li>';
+                    });
+                    descriptionHtml += '</ul>';
+                    $('#descriptionDiv').html(descriptionHtml);
+                     descriptionHtml1 += '</ul>';
+                    $('#divLeft').html(descriptionHtml1);
+                     descriptionHtml2 += '</ul>';
+                    $('#divRight').html(descriptionHtml2);
+
+                    $.each(response.responseCode, function(index, item) {
+                        descriptionHtml1 += '<li>' + item + '</li>';
+                    });
+                     $('#divRight').html(descriptionHtml1);
+
+                    $.each(response.theoryPortion, function(index, item) {
+                        descriptionHtml2 += '<li>' + item + '</li>';
+                    });
+                      $('#divLeft').html(descriptionHtml2);
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    $('#responseDiv').html('<p style="color: red;">An error occurred while sorting the array.</p>');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
